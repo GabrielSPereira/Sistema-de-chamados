@@ -116,10 +116,7 @@ namespace WebApp_Desafio_BackEnd.DataAccess
 
                     int count = Convert.ToInt32(dbCommand.ExecuteScalar());
 
-                    if (count > 0)
-                    {
-                        possuiChamado = true;
-                    }
+                    possuiChamado = count > 0;
 
                     dbConnection.Close();
                 }
