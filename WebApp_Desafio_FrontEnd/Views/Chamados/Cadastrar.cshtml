@@ -18,43 +18,31 @@
             <div class="row">
                 <div class="form-group col-lg-7 col-md-6 col-sm-12">
                     <label class="form-label" asp-for="Assunto"></label>
-                    <input type="text" class="form-control" asp-for="Assunto">
+                    <input type="text" class="form-control" asp-for="Assunto" required maxlength="100">
                     <span class="text-danger" asp-validation-for="Assunto"></span>
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-lg-7 col-md-6 col-sm-12">
                     <label class="form-label" asp-for="Solicitante"></label>
-                    <input type="text" class="form-control" asp-for="Solicitante">
+                    <input type="text" class="form-control" asp-for="Solicitante" id="Solicitante" required maxlength="100">
                     <span class="text-danger" asp-validation-for="Solicitante"></span>
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-lg-5 col-md-4 col-sm-8">
                     <label class="form-label" asp-for="Departamento"></label>
-                    <select data-placeholder="Selecionar" class="form-control chosen-select" asp-for="IdDepartamento" readonly="readonly" id="Departamento">
-                        <option value=""></option>
-                        @foreach (var item in ViewData["ListaDepartamentos"] as List<DepartamentoViewModel>)
-                        {
-                            if (item.ID == Model.IdDepartamento)
-                            {
-                                <option data-codbanco="@item.ID" value="@item.ID" selected="selected">@item.Descricao</option>
-                            }
-                            else
-                            {
-                                <option data-codbanco="@item.ID" value="@item.ID">@item.Descricao</option>
-                            }
-                        }
-                    </select>
+                    <input type="hidden" asp-for="IdDepartamento" value="@Model.IdDepartamento" />
+                    <input type="text" class="form-control" id="Departamento" name="Departamento" value="@Model.Departamento" placeholder="Selecionar" required autocomplete="on">
                     <span class="text-danger" asp-validation-for="Departamento"></span>
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-lg-3 col-md-3 col-sm-3">
-                    <label class="form-label" asp-for="DataAbertura"></label>
+                    <label class="form-label" asp-for="DataAbertura">Data de abertura</label>
 
                     <div class="input-group date" data-provide="datepicker">
-                        <input type="text" class="form-control" asp-for="DataAbertura" asp-format="{0:dd/MM/yyyy}" />
+                        <input type="text" class="form-control" asp-for="DataAbertura" asp-format="{0:dd/MM/yyyy}" required/>
                         <div class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
                         </div>
@@ -82,6 +70,8 @@
 @section styles
     {
     <link rel="stylesheet" href="~/lib/sweetalert2/sweetalert2.min.css" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+
     @*<link rel="stylesheet" href="~/lib/bootstrap-datepicker/css/bootstrap-datepicker.min.css" />*@
     @*<link rel="stylesheet" href="~/lib/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" />*@
 }
@@ -95,6 +85,42 @@
     <script src="~/lib/bootstrap-datepicker/locales/bootstrap-datepicker.pt-br.min.js"></script>
 
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-
+    <script src="~/lib/jquery-validation/dist/additional-methods.js"></script>
     <script src="~/js/Chamados/Cadastrar.js" asp-append-version="true"></script>
+
+    <!-- Autocomplete -->
+    <script src="~/lib/autocomplete/dist/jquery-ui.js"></script>
+
+    <script>
+        $(function () {
+            var departamentos = [
+                @foreach (var item in ViewData["ListaDepartamentos"] as List<DepartamentoViewModel>)
+                {
+                    <text>{ label: "@item.Descricao", id: "@item.ID" }, </text>
+                }
+            ];
+
+            $("#@nameof(ChamadoViewModel.Departamento)").autocomplete({
+                source: departamentos,
+                select: function (event, ui) {
+                    $('#@nameof(ChamadoViewModel.IdDepartamento)').val(ui.item.id);
+                },
+                change: function (event, ui) {
+                    var inputValue = $(this).val();
+                    var item = departamentos.find(function (item) {
+                        return item.label.toLowerCase() === inputValue.toLowerCase();
+                    });
+
+                    if (!ui.item && !item) {
+                        this.value = '';
+                        validation = false;
+                    } else {
+                        $('#@nameof(ChamadoViewModel.IdDepartamento)').val(item.id);
+                        validation = true;
+                    }
+                }
+            });
+
+        });
+    </script>
 }

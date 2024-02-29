@@ -11,9 +11,7 @@ namespace WebApp_Desafio_API.Controllers
     /// <summary>
     /// ChamadosController
     /// </summary>
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ChamadosController : Controller
+    public class ChamadosController : BaseController
     {
         private ChamadosBLL bll = new ChamadosBLL();
 
@@ -46,24 +44,16 @@ namespace WebApp_Desafio_API.Controllers
 
                 return Ok(lst);
             }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ApplicationException ex)
-            {
-                return StatusCode(422, ex.Message);
-            }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return HandleException(ex);
             }
         }
 
         /// <summary>
         /// Obtém dados de um chamado específico
         /// </summary>
-        /// <param name="idChamado">O ID do chamado a ser obtido</param>
+        /// <param name="id">O ID do chamado a ser obtido</param>
         /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(ChamadoResponse), StatusCodes.Status200OK)]
@@ -71,11 +61,11 @@ namespace WebApp_Desafio_API.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         [Route("Obter")]
-        public IActionResult Obter([FromQuery] int idChamado)
+        public IActionResult Obter([FromQuery] int id)
         {
             try
             {
-                var _chamado = this.bll.ObterChamado(idChamado);
+                var _chamado = this.bll.ObterChamado(id);
 
                 var chamado = new ChamadoResponse()
                               {
@@ -89,17 +79,9 @@ namespace WebApp_Desafio_API.Controllers
 
                 return Ok(chamado);
             }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ApplicationException ex)
-            {
-                return StatusCode(422, ex.Message);
-            }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return HandleException(ex);
             }
         }
 
@@ -127,48 +109,33 @@ namespace WebApp_Desafio_API.Controllers
 
                 return Ok(resultado);
             }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ApplicationException ex)
-            {
-                return StatusCode(422, ex.Message);
-            }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return HandleException(ex);
             }
         }
-        
+
         /// <summary>
         /// Exclui um chamado específico
         /// </summary>
+        /// <param name="id">O ID do chamado a ser excluido</param>
         [HttpDelete]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         [Route("Excluir")]
-        public IActionResult Excluir([FromRoute] int idChamado)
+        public IActionResult Excluir([FromQuery] int id)
         {
             try
             {
-                var resultado = this.bll.ExcluirChamado(idChamado);
+                var resultado = this.bll.ExcluirChamado(id);
 
                 return Ok(resultado);
             }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ApplicationException ex)
-            {
-                return StatusCode(422, ex.Message);
-            }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return HandleException(ex);
             }
         }
     }

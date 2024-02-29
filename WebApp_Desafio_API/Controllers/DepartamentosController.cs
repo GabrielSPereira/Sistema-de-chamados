@@ -11,9 +11,7 @@ namespace WebApp_Desafio_API.Controllers
     /// <summary>
     /// DepartamentosController
     /// </summary>
-    [ApiController]
-    [Route("api/[controller]")]
-    public class DepartamentosController : Controller
+    public class DepartamentosController : BaseController
     {
         private DepartamentosBLL bll = new DepartamentosBLL();
 
@@ -42,17 +40,92 @@ namespace WebApp_Desafio_API.Controllers
 
                 return Ok(lst);
             }
-            catch (ArgumentException ex)
+            catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return HandleException(ex);
             }
-            catch (ApplicationException ex)
+        }
+
+        /// <summary>
+        /// Obtém dados de um departamento específico
+        /// </summary>
+        /// <param name="id">O ID do departamento a ser obtido</param>
+        /// <returns></returns>
+        [HttpGet]
+        [ProducesResponseType(typeof(DepartamentoResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        [Route("Obter")]
+        public IActionResult Obter([FromQuery] int id)
+        {
+            try
             {
-                return StatusCode(422, ex.Message);
+                var _departamento = this.bll.ObterDepartamento(id);
+
+                var departamento = new DepartamentoResponse()
+                {
+                    id = _departamento.ID,
+                    descricao = _departamento.Descricao,
+                };
+
+                return Ok(departamento);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return HandleException(ex);
+            }
+        }
+
+        /// <summary>
+        /// Grava os dados de um departamento
+        /// </summary>
+        /// <param name="request">Dados para requisição de departamento</param>
+        [HttpPost]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        [Route("Gravar")]
+        public IActionResult Gravar([FromBody] DepartamentoRequest request)
+        {
+            try
+            {
+                if (request == null)
+                    throw new ArgumentNullException("Request não informado.");
+
+                var resultado = this.bll.GravarDepartamento(request.id,
+                                                       request.descricao);
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
+        /// <summary>
+        /// Exclui um departamento específico
+        /// </summary>
+        /// <param name="id">O ID do departamento a ser excluido</param>
+        [HttpDelete]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        [Route("Excluir")]
+        public IActionResult Excluir([FromQuery] int id)
+        {
+            try
+            {
+                var resultado = this.bll.ExcluirDepartamento(id);
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
             }
         }
     }

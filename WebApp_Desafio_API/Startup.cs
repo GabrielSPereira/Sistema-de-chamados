@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using WebApp_Desafio_API.Filters;
 
 namespace WebApp_Desafio_API
 {
@@ -39,7 +40,10 @@ namespace WebApp_Desafio_API
         {
             services
                 .AddHttpContextAccessor()
-                .AddMvc()
+                .AddMvc(options =>
+                {
+                    options.Filters.Add(typeof(ValidationFilterAttribute));
+                })
                 .AddViewOptions(options => options.HtmlHelperOptions.ClientValidationEnabled = true)
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddJsonOptions(options => options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)

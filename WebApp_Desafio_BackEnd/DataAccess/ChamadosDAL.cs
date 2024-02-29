@@ -43,23 +43,11 @@ namespace WebApp_Desafio_BackEnd.DataAccess
 
                         while (dataReader.Read())
                         {
-                            chamado = new Chamado();
-
-                            if (!dataReader.IsDBNull(0))
-                                chamado.ID = dataReader.GetInt32(0);
-                            if (!dataReader.IsDBNull(1))
-                                chamado.Assunto = dataReader.GetString(1);
-                            if (!dataReader.IsDBNull(2))
-                                chamado.Solicitante = dataReader.GetString(2);
-                            if (!dataReader.IsDBNull(3))
-                                chamado.IdDepartamento = dataReader.GetInt32(3);
-                            if (!dataReader.IsDBNull(4))
-                                chamado.Departamento = dataReader.GetString(4);
-                            if (!dataReader.IsDBNull(5))
-                                chamado.DataAbertura = DateTime.Parse(dataReader.GetString(5));
+                            chamado = MapChamadoFromDataReader(dataReader);
 
                             lstChamados.Add(chamado);
                         }
+
                         dataReader.Close();
                     }
                     dbConnection.Close();
@@ -98,22 +86,9 @@ namespace WebApp_Desafio_BackEnd.DataAccess
                     {
                         if (dataReader.Read())
                         {
-                            chamado = new Chamado();
-
-                            if (!dataReader.IsDBNull(0))
-                                chamado.ID = dataReader.GetInt32(0);
-                            if (!dataReader.IsDBNull(1))
-                                chamado.Assunto = dataReader.GetString(1);
-                            if (!dataReader.IsDBNull(2))
-                                chamado.Solicitante = dataReader.GetString(2);
-                            if (!dataReader.IsDBNull(3))
-                                chamado.IdDepartamento = dataReader.GetInt32(3);
-                            if (!dataReader.IsDBNull(4))
-                                chamado.Departamento = dataReader.GetString(4);
-                            if (!dataReader.IsDBNull(5))
-                                chamado.DataAbertura = DateTime.Parse(dataReader.GetString(5));
-
+                            chamado = MapChamadoFromDataReader(dataReader);
                         }
+
                         dataReader.Close();
                     }
                     dbConnection.Close();
@@ -123,6 +98,36 @@ namespace WebApp_Desafio_BackEnd.DataAccess
 
             return chamado;
         }
+
+        public bool VerificarSeChamadoPossuiDepartamento(int idDepartamento)
+        {
+            bool possuiChamado = false;
+
+            using (SQLiteConnection dbConnection = new SQLiteConnection(CONNECTION_STRING))
+            {
+                using (SQLiteCommand dbCommand = dbConnection.CreateCommand())
+                {
+                    dbCommand.CommandText =
+                        "SELECT COUNT(*) " +
+                        "FROM chamados " +
+                        $"WHERE chamados.IdDepartamento = {idDepartamento}";
+
+                    dbConnection.Open();
+
+                    int count = Convert.ToInt32(dbCommand.ExecuteScalar());
+
+                    if (count > 0)
+                    {
+                        possuiChamado = true;
+                    }
+
+                    dbConnection.Close();
+                }
+            }
+
+            return possuiChamado;
+        }
+
 
         public bool GravarChamado(int ID, string Assunto, string Solicitante, int IdDepartamento, DateTime DataAbertura)
         {
@@ -185,6 +190,20 @@ namespace WebApp_Desafio_BackEnd.DataAccess
             }
 
             return (regsAfetados > 0);
+        }
+
+        private Chamado MapChamadoFromDataReader(SQLiteDataReader dataReader)
+        {
+            Chamado chamado = new Chamado();
+
+            chamado.ID = dataReader.GetInt32(0);
+            chamado.Assunto = dataReader.GetString(1);
+            chamado.Solicitante = dataReader.GetString(2);
+            chamado.IdDepartamento = dataReader.GetInt32(3);
+            chamado.Departamento = dataReader.GetString(4);
+            chamado.DataAbertura = DateTime.Parse(dataReader.GetString(5));
+
+            return chamado;
         }
     }
 }

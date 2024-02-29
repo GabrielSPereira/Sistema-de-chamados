@@ -1,24 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using WebApp_Desafio_FrontEnd.ApiClients.Desafio_API;
 using WebApp_Desafio_FrontEnd.ViewModels;
 using WebApp_Desafio_FrontEnd.ViewModels.Enums;
 using AspNetCore.Reporting;
-using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure;
 
 namespace WebApp_Desafio_FrontEnd.Controllers
 {
     public class ChamadosController : Controller
     {
         private readonly IHostingEnvironment _hostEnvironment;
+        private readonly ChamadosApiClient _chamadosApiClient;
 
         public ChamadosController(IHostingEnvironment hostEnvironment)
         {
             _hostEnvironment = hostEnvironment;
+            _chamadosApiClient = new ChamadosApiClient();
         }
 
         [HttpGet]
@@ -39,8 +38,7 @@ namespace WebApp_Desafio_FrontEnd.Controllers
         {
             try
             {
-                var chamadosApiClient = new ChamadosApiClient();
-                var lstChamados = chamadosApiClient.ChamadosListar();
+                var lstChamados = _chamadosApiClient.ChamadosListar();
 
                 var dataTableVM = new DataTableAjaxViewModel()
                 {
@@ -84,8 +82,7 @@ namespace WebApp_Desafio_FrontEnd.Controllers
         {
             try
             {
-                var chamadosApiClient = new ChamadosApiClient();
-                var realizadoComSucesso = chamadosApiClient.ChamadoGravar(chamadoVM);
+                var realizadoComSucesso = _chamadosApiClient.ChamadoGravar(chamadoVM);
 
                 if (realizadoComSucesso)
                     return Ok(new ResponseViewModel(
@@ -105,7 +102,7 @@ namespace WebApp_Desafio_FrontEnd.Controllers
         [HttpGet]
         public IActionResult Editar([FromRoute] int id)
         {
-            ViewData["Title"] = "Cadastrar Novo Chamado";
+            ViewData["Title"] = "Editar Chamado";
 
             try
             {
