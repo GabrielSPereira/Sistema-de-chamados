@@ -31,7 +31,7 @@ namespace WebApp_Desafio_BackEnd.Business
             bool possuiChamado = dalChamado.VerificarSeChamadoPossuiDepartamento(idDepartamento);
             if (possuiChamado)
             {
-                throw new ApplicationException("Não é possível excluir o departamento pois ele é utilizado em chamado.");
+                throw new ApplicationException("Não é possível excluir o departamento pois ele é utilizado em ao menos um chamado.");
             }
 
             return dal.ExcluirDepartamento(idDepartamento);
